@@ -1,20 +1,37 @@
-const express = require('express');
-const path = require('path');
-const mongoose = require('mongoose');
+const express = require('express')
+const path = require('path')
+const fs = require('fs')
+const mongoose = require('mongoose')
+const velocity = require('velocityjs');
 const _ = require('underscore')   //新数据替换老数据
-const port = process.env.PORT || 4000 ;
-const app = express();
+const port = process.env.PORT || 4000
+
+const app = express()
 const Movie = require('./modles/movie')
 mongoose.connect('mongoose://localhost/mis-node')
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname, '/resources')));
 // 模板引擎
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '/resources/'))
 app.set('view engine', 'html');
-app.engine('html', require('ejs').__express);
+app.engine('html',(path,options,fn) => {
+let template = fs.readFileSync(path).toString();
+let macros = {
+  parse: function(file) {
+  let template = fs.readFileSync(__dirname + '/resources/' + file).toString()
+  return this.eval(template);
+  }
+}
+try{
+fn(null, velocity.render(template, options, macros))
+}catch(err){
+console.log(err);
+fn(err)
+}
+});
 
 //路由 首页
 app.get('/', (req, res) => {
-   res.render('index', {
+   res.render('views/base/index', {
      title: '首页'
    })
 })
@@ -26,7 +43,7 @@ app.get('/movie/:id', (req, res) => {
        console.log(err)
      }
      res.render('detail', {
-       title: '详情页'，
+       title: '详情页',
        movies: data
      })
    })
@@ -38,7 +55,7 @@ app.get('/admin/movie', (req, res) => {
       console.log(err)
     }
     res.render('detail', {
-      title: '详情页'，
+      title: '详情页',
       movies: data
     })
   })

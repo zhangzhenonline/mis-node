@@ -1,16 +1,16 @@
 //创建模式
 let mongoose = require("mongoose");
-let MovieSchema = new.mongoose.Schema({
+let MovieSchema = new mongoose.Schema({
   name: String,
   title: String,
   year: Number,
   meta: {
     createAt: {
-      type: Date，
+      type: Date,
       default: Date.now()
     },
     updateAt: {
-      type: Date，
+      type: Date,
       default: Date.now()
     }
   }
@@ -30,7 +30,7 @@ MovieSchema.statics = {
         .find({})
         .sort('meta.updateAt')
         exec(cb)
-  }
+  },
   findById: (id,cb) => {
     return this
         .findOne({_id: id})
