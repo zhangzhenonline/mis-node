@@ -3,13 +3,23 @@ const path = require('path')
 const fs = require('fs')
 const mongoose = require('mongoose')
 const velocity = require('velocityjs');
+const bodyParser = require('body-parser');
 const _ = require('underscore')   //新数据替换老数据
 const port = process.env.PORT || 4000
 
 const app = express()
+
 const Movie = require('./modles/movie')
-mongoose.connect('mongoose://localhost/mis-node')
+const db = mongoose.connect('mongodb://localhost:27017/mis-node')
+db.connection.on("open", ()=>{
+  console.log("数据库连接成功")
+})
+db.connection.on("error", (error)=>{
+  console.log("数据库连接失败"+ error)
+})
 app.use(express.static(path.join(__dirname, '/resources')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 // 模板引擎
 app.set('views', path.join(__dirname, '/resources/'))
 app.set('view engine', 'html');
@@ -22,11 +32,12 @@ let macros = {
   }
 }
 try{
-fn(null, velocity.render(template, options, macros))
+  fn(null, velocity.render(template, options, macros))
 }catch(err){
-console.log(err);
-fn(err)
+  console.log(err);
+  fn(err)
 }
+
 });
 
 //路由 首页
@@ -68,8 +79,8 @@ app.get('/admin/list', (req, res) => {
 })
 // post 提交
 app.post('/admin/movie/new', (req, res) => {
-  let id = req.body.movie._id;
-  let movieObj = req.body.movies;
+  let id = req.body.id;
+  let movieObj = req.body;
   let _movie
    if(id !== 'undefined'){
      Movie.findById(id ,(err, data) => {
@@ -87,15 +98,18 @@ app.post('/admin/movie/new', (req, res) => {
      })
    }
    else{
+     console.log("--------------")
        _movie = new Movie({
          name: movieObj.name,
          title: movieObj.title,
          year: movieObj.year,
        })
+       console.log(_movie);
        _movie.save((err, data) => {
          if(err){
            console.log(err)
          }
+         console.log(data);
          res.redirect('/movie' + movie._id)
        })
    }

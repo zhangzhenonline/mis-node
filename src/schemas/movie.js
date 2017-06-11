@@ -25,13 +25,13 @@ MovieSchema.pre('save', (next)=>{
   next()
 })
 MovieSchema.statics = {
-  fetch: (cb) => {
+  fetch: function(cb){
     return this
         .find({})
         .sort('meta.updateAt')
         exec(cb)
   },
-  findById: (id,cb) => {
+  findById: function (id,cb) {
     return this
         .findOne({_id: id})
         exec(cb)
