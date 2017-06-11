@@ -15,26 +15,27 @@ let MovieSchema = new mongoose.Schema({
     }
   }
 })
+let Movie = mongoose.model('Movie', MovieSchema);
 //每一保存一条数据，更新一个时间
-MovieSchema.pre('save', (next)=>{
-  if(this.isNew) {
-    this.meta.createAt = this.meta.updateAt =  Date.now()
-  }else{
-    this.meta.updateAt =  Date.now()
-  }
-  next()
-})
-MovieSchema.statics = {
-  fetch: function(cb){
-    return this
-        .find({})
-        .sort('meta.updateAt')
-        exec(cb)
-  },
-  findById: function (id,cb) {
-    return this
-        .findOne({_id: id})
-        exec(cb)
-  }
-}
-module.exports = MovieSchema
+// MovieSchema.pre('save', (next)=>{
+//   if(this.isNew) {
+//     this.meta.createAt = this.meta.updateAt =  Date.now()
+//   }else{
+//     this.meta.updateAt =  Date.now()
+//   }
+//   next()
+// })
+// MovieSchema.statics = {
+//   fetch: function(cb){
+//     return this
+//         .find({})
+//         .sort('meta.updateAt')
+//         exec(cb)
+//   },
+//   findById: function (id,cb) {
+//     return this
+//         .findOne({_id: id})
+//         exec(cb)
+//   }
+// }
+module.exports = Movie

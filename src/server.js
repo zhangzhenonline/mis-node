@@ -9,7 +9,7 @@ const port = process.env.PORT || 4000
 
 const app = express()
 
-const Movie = require('./modles/movie')
+const Movie = require('./schemas/movie')
 const db = mongoose.connect('mongodb://localhost:27017/mis-node')
 db.connection.on("open", ()=>{
   console.log("数据库连接成功")
@@ -81,38 +81,19 @@ app.get('/admin/list', (req, res) => {
 app.post('/admin/movie/new', (req, res) => {
   let id = req.body.id;
   let movieObj = req.body;
-  let _movie
-   if(id !== 'undefined'){
-     Movie.findById(id ,(err, data) => {
-        if(err){
-          console.log(err)
-        }
-        // 将查询的放在第一个参数上， 第二个参数是post参数上
-        _movie = _.extend(movie, movieObj)
-        _movie.save((err, data) => {
-          if(err){
-            console.log(err)
-          }
-          res.redirect('/movie' + movie._id)
-        })
-     })
-   }
-   else{
-     console.log("--------------")
+  let _movie;
        _movie = new Movie({
          name: movieObj.name,
          title: movieObj.title,
          year: movieObj.year,
        })
-       console.log(_movie);
        _movie.save((err, data) => {
          if(err){
            console.log(err)
          }
          console.log(data);
-         res.redirect('/movie' + movie._id)
        })
-   }
+
 
 })
 //端口号
